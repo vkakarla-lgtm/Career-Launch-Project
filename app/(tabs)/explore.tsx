@@ -12,11 +12,12 @@ import {
   View,
 } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
+import { useRouter } from 'expo-router';
 
 // Types
 interface ToolListing {
   id: string;
-  title: string;
+  name: string;
   price: number;
   distance: number;
   coordinate: {
@@ -25,63 +26,79 @@ interface ToolListing {
   };
   owner: string;
   rating: number;
+  description: string;
+  images: string[];
 }
+
+
 
 // Dummy data for tool listings (DC area)
 const DUMMY_LISTINGS: ToolListing[] = [
   {
     id: '1',
-    title: 'DeWalt Power Drill',
-    price: 15,
+    name: 'DeWalt Power Drill',
+    price: 5,
     distance: 0.3,
     coordinate: { latitude: 38.9072, longitude: -77.0369 },
     owner: 'Mike S.',
     rating: 4.8,
+    description: 'description',
+    images: [],
   },
   {
     id: '2',
-    title: 'Circular Saw',
+    name: 'Circular Saw',
     price: 25,
     distance: 0.7,
     coordinate: { latitude: 38.91, longitude: -77.042 },
     owner: 'Sarah K.',
     rating: 4.5,
+    description: 'description',
+    images: [],
   },
   {
     id: '3',
-    title: 'Pressure Washer',
+    name: 'Pressure Washer',
     price: 40,
     distance: 1.2,
     coordinate: { latitude: 38.915, longitude: -77.03 },
     owner: 'John D.',
     rating: 4.9,
+    description: 'description',
+    images: [],
   },
   {
     id: '4',
-    title: 'Ladder - 12ft Extension',
+    name: 'Ladder - 12ft Extension',
     price: 12,
     distance: 0.5,
     coordinate: { latitude: 38.902, longitude: -77.045 },
     owner: 'Emily R.',
     rating: 4.7,
+    description: 'description',
+    images: [],
   },
   {
     id: '5',
-    title: 'Cordless Drill Set',
+    name: 'Cordless Drill Set',
     price: 18,
     distance: 1.5,
     coordinate: { latitude: 38.92, longitude: -77.025 },
     owner: 'Chris M.',
     rating: 4.6,
+    description: 'description',
+    images: [],
   },
   {
     id: '6',
-    title: 'Table Saw',
+    name: 'Table Saw',
     price: 35,
     distance: 2.0,
     coordinate: { latitude: 38.895, longitude: -77.05 },
     owner: 'David L.',
     rating: 4.4,
+    description: 'description',
+    images: [],
   },
 ];
 
@@ -100,6 +117,8 @@ const ToolSearchScreen: React.FC = () => {
   const [selectedListing, setSelectedListing] = useState<ToolListing | null>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
 
+  const router = useRouter();
+
   const mapRef = useRef<MapView>(null);
 
   const handleSearch = (text: string): void => {
@@ -110,7 +129,7 @@ const ToolSearchScreen: React.FC = () => {
       setShowResults(false);
     } else {
       const filtered = DUMMY_LISTINGS.filter((listing) =>
-        listing.title.toLowerCase().includes(text.toLowerCase())
+        listing.name.toLowerCase().includes(text.toLowerCase())
       );
       setFilteredListings(filtered);
       setShowResults(true);
@@ -120,7 +139,7 @@ const ToolSearchScreen: React.FC = () => {
   const handleSelectListing = (listing: ToolListing): void => {
     setSelectedListing(listing);
     setShowResults(false);
-    setSearchQuery(listing.title);
+    setSearchQuery(listing.name);
     Keyboard.dismiss();
 
     mapRef.current?.animateToRegion(
@@ -135,6 +154,13 @@ const ToolSearchScreen: React.FC = () => {
 
   const handleMarkerPress = (listing: ToolListing): void => {
     setSelectedListing(listing);
+    router.push({
+      pathname: '/tool-details',
+      params: {
+        tool: encodeURIComponent(JSON.stringify(listing))
+      }
+    });
+    
   };
 
   const handleClearSearch = (): void => {
@@ -155,7 +181,7 @@ const ToolSearchScreen: React.FC = () => {
   const handleRentRequest = (): void => {
     if (selectedListing) {
       // TODO: Navigate to rental request flow
-      console.log('Requesting to rent:', selectedListing.title);
+      console.log('Requesting to rent:', selectedListing.name);
     }
   };
 
@@ -165,7 +191,7 @@ const ToolSearchScreen: React.FC = () => {
       onPress={() => handleSelectListing(item)}
     >
       <View style={styles.resultInfo}>
-        <Text style={styles.resultTitle}>{item.title}</Text>
+        <Text style={styles.resultTitle}>{item.name}</Text>
         <Text style={styles.resultSubtitle}>
           {item.distance} mi away â€¢ ${item.price}/day
         </Text>
@@ -257,7 +283,7 @@ const ToolSearchScreen: React.FC = () => {
       {selectedListing && !showResults && (
         <View style={styles.listingCard}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>{selectedListing.title}</Text>
+            <Text style={styles.cardTitle}>{selectedListing.name}</Text>
             <Text style={styles.cardRating}>â˜… {selectedListing.rating}</Text>
           </View>
           <Text style={styles.cardOwner}>Listed by {selectedListing.owner}</Text>
@@ -269,6 +295,9 @@ const ToolSearchScreen: React.FC = () => {
           </View>
           <TouchableOpacity style={styles.rentButton} onPress={handleRentRequest}>
             <Text style={styles.rentButtonText}>Request to Rent</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.rentButton} onPress={() => selectedListing && handleMarkerPress(selectedListing)}>
+            <Text style={styles.rentButtonText}>View Full Description</Text>
           </TouchableOpacity>
         </View>
       )}
