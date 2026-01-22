@@ -1,15 +1,7 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
-export const unstable_settings = {
-  anchor: '(tabs)',
-};
+import { Slot } from 'expo-router';
 
 export default function RootLayout() {
+<<<<<<< HEAD
   const colorScheme = useColorScheme();
 
   return (
@@ -23,3 +15,7 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+=======
+  return <Slot />;
+}
+>>>>>>> a998ff6 (Fix authentication and routing - app now working)

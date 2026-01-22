@@ -2,7 +2,6 @@ import RNDateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { addDoc, collection, getDocs, getFirestore } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Formik } from 'formik';
 import { useEffect, useState } from 'react';
 import { 
@@ -18,7 +17,7 @@ import {
   ScrollView 
 } from "react-native";
 import RNPickerSelect from 'react-native-picker-select';
-import { app } from '../../firebaseConfig';
+import { app, storage } from '../../firebaseConfig';
 
 interface Category {
   type: string;
@@ -32,15 +31,13 @@ interface FormValues {
   image: string;
 }
 
-export default async function Post() {
+export default function Post() {
   const [categoryList, setCategoryList] = useState<Category[]>([]);
   const db = getFirestore(app);
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
   const [show, setShow] = useState(false);
-  await AsyncStorage.setItem('key', 'value');
-  const value = await AsyncStorage.getItem('key');
 
   useEffect(() => {
     getCategoryList();
